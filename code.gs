@@ -94,6 +94,17 @@ function doPost(e) {
   sheet.appendRow(row);
   const rowIndex = sheet.getLastRow();
 
+  // TAMBAHAN: Deteksi ucapan terima kasih dan respon pendek
+  const ucapanPattern =
+    /^(makasih|terima\s*kasih|thank\s*you|thanks|thx|tq|ok(e|ay)?|oke|sip|baik|mantap|mantul|siap|nuhun|matur\s*nuwun|matur\s*suwun|hatur\s*nuhun|trims)$/i;
+
+  if (ucapanPattern.test(pesan.trim())) {
+    const balasanUcapan = getRandomResponse();
+    sheet.getRange(`E${rowIndex}`).setValue(balasanUcapan);
+    kirimPesan(nomor, balasanUcapan);
+    return ContentService.createTextOutput("OK");
+  }
+
   let prompt = "";
   if (pesan.includes("saldo")) {
     let rincianSaldo = daftarAset
@@ -245,6 +256,24 @@ ${daftarSumberDana.map((sumber) => "- " + sumber).join("\n")}
     kirimPesan(nomor, responGemini);
   }
   return ContentService.createTextOutput("OK");
+}
+
+// Fungsi baru: Mendapatkan respons acak untuk ucapan terima kasih
+function getRandomResponse() {
+  const responses = [
+    "Sama-sama! 😊 Senang bisa membantu kamu mengatur keuangan~",
+    "Siap! 👍 Ada yang bisa kubantu lagi?",
+    "Oke! 😉 Jangan ragu hubungi aku kalau butuh bantuan lagi ya!",
+    "Dengan senang hati! 🌟 Aku selalu siap membantu kapanpun kamu butuh.",
+    "Sip! 🙌 Semoga keuanganmu makin teratur ya!",
+    "No problem! 👌 Aku ada di sini kapanpun kamu butuh.",
+    "Tentu! 😎 Itulah gunanya BotBudgetFinance.",
+    "Ok! 🤖 Tetap semangat mengelola keuanganmu ya!",
+    "Sama-sama kak! 🌈 Ada lagi yang bisa kubantu?",
+    "Sukses selalu untuk keuanganmu! 💪",
+  ];
+
+  return responses[Math.floor(Math.random() * responses.length)];
 }
 
 // FUNGSI YANG DISINKRONKAN DARI SCRIPT KEDUA:
